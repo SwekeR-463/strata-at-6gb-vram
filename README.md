@@ -95,19 +95,19 @@ results/                       JSON/CSV output of every measured run
 Strata/                        engine checkout (github.com/Niko1221/Strata) — gitignored
 Strata-data/                   model shards, pack (experts.bin), MTP draft — gitignored
 download-throttle.patch        our downloader patch
-docs/AGENTS.md                 notes for the agent driving this box
+AGENTS.md                      notes for the agent driving this box
 ```
 
 ---
 
-# Methodology
+## Methodology
 
 A ~63 GB model, 6 GB of VRAM, 15 GB of RAM. Everything here is an answer to two questions:
 **which** 6 GB, and what never gets read at all. To claim anything about the numbers, the two
 contributors have to be separated: **what Strata's engine does by design**, and **what this project
 changed to make it fit a box the engine refuses**. Both are below, with the evidence for each.
 
-## 1. The data path — where the model actually lives
+### 1. The data path — where the model actually lives
 
 The model is not "loaded". It is split across three tiers, and only a fraction of it is ever in
 memory:
@@ -122,7 +122,7 @@ memory:
 Total SSD footprint is ~96 GB (63 GB of GGUFs + a 33 GB prepared pack) to run a model that needs
 63 GB of weights in a 6 GB card.
 
-### One generated token
+#### One generated token
 
 ```mermaid
 flowchart TB
@@ -175,7 +175,7 @@ Reading the diagram left to right, the two facts that decide every number in thi
    `ceil(prompt / chunk)` passes of ~25 GB at ~1.9 GB/s, which is why chunk size and prefix reuse —
    not the plumbing — set prompt speed.
 
-## 2. What Strata does (we did not change any of it)
+### 2. What Strata does (we did not change any of it)
 
 The architecture that makes a 177B MoE with ~10 of 24,576 experts per token fit in 6 GB is the
 engine's. These are its principles, and every one of them is running at its default here:
@@ -201,7 +201,7 @@ engine's. These are its principles, and every one of them is running at its defa
 **Defaults we deliberately left alone and measured:** `--expert-cache auto`, `--prefill auto`,
 `STRATA_PREFILL_CPU_SHARE`, `STRATA_ROUTE_TAIL_SKIP`.
 
-## 3. What we changed to make it fit, and why
+### 3. What we changed to make it fit, and why
 
 Nine deltas. Each one is a decision against a documented Strata behaviour, with the measurement
 that justified it.
@@ -218,7 +218,7 @@ that justified it.
 | 8 | download | unthrottled | `download-throttle.patch` → 3.5 MiB/s | keep a 66 GB pull inside the link's 4 MiB/s limit | 66 GB pulled without saturating the link |
 | 9 | port | 8080 | **8097** (in `.port` and `scripts/run.sh`) | SearXNG owns 8080 on this box, kubectl port-forwards own 8081–8082 | environment detail, not a tuning win |
 
-### Delta 3 in detail: the context ladder nobody would have guessed
+#### Delta 3 in detail: the context ladder nobody would have guessed
 
 `--max-context` was not a knob you can turn up on a 6 GB card. The ladder, one variable at a time:
 
@@ -245,7 +245,7 @@ trade, not an oversight: no instability appeared across the requests measured, b
 `--vram-reserve-mib 512` is the aggressive part of this config and the first thing to raise if
 anything goes strange.
 
-### Delta 6 in detail: parking, and why `park-gain` is not cosmetic
+#### Delta 6 in detail: parking, and why `park-gain` is not cosmetic
 
 A real role-based multi-turn conversation — the shape an agent actually sends — against the live
 server (`tools/reuse-test.py`):
@@ -290,7 +290,7 @@ Two things a reader should understand before reusing these flags:
 A parked 5,229-token conversation measures 429 MB, so the 1,024 MiB budget holds about two of them
 (`--conversation-cache-slots 4` is the count, `--conversation-cache-min-free-mib` the RAM floor).
 
-## 4. Levers we tested and rejected
+### 4. Levers we tested and rejected
 
 Null results are part of the methodology. These were tried on the same box, same protocol:
 
@@ -304,7 +304,7 @@ Null results are part of the methodology. These were tried on the same box, same
 | `STRATA_PREFILL_CPU_SHARE=auto` | prefill +13% | **+13% prefill, but swap hit 100%** | 31.2 GiB of file pages vs 7.6 GiB free RAM — rejected |
 | chunk 2048 | one fewer pass | would barely help | a 2,506-token prompt is two passes at chunk 1280 **and** two at 2048. Only a chunk ≥ the prompt buys one pass, and that needs ~0.67 MiB of chunk buffers per token — 21 GiB at 32k. Not on a 6 GB card |
 
-## 5. How each number was measured
+### 5. How each number was measured
 
 | Tool | Measures | How |
 |---|---|---|
@@ -320,7 +320,7 @@ MoE on 6 GB is only possible because of that design — the architecture is Stra
 deltas above (context ladder, VRAM retune, parking, no MTP) are this project's. The tests exercise
 Strata's OpenAI-compatible surface exactly as a real client would.
 
-## 6. What this methodology cannot claim
+### 6. What this methodology cannot claim
 
 - **One box, one session.** All numbers are from a single RTX 4050 Laptop / 15 GB machine on one
   day. No cross-hardware validation.
@@ -340,7 +340,7 @@ Strata's OpenAI-compatible surface exactly as a real client would.
 
 ---
 
-# Results
+## Results
 
 Full per-task tables and raw run paths are in [`results.md`](results.md). Headline numbers:
 
