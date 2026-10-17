@@ -1,0 +1,30 @@
+{
+  "exe": "{{ROOT}}/Strata/engine/strata",
+  "args": [
+    "--pack", "{{DATA_DIR}}/packs/q2_0",
+    "--native", "{{DATA_DIR}}/models/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+    "--ple-gguf", "{{DATA_DIR}}/models/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+    "--expert-profile", "{{ROOT}}/Strata/data/expert-profile.bin",
+    "--expert-cache", "auto",
+    "--prefill", "auto",
+    "--spec", "4",
+    "--spec-min-p", "0.5",
+    "--max-context", "{{CONTEXT}}",
+    "--kv", "int8",
+    "--vram-reserve-mib", "{{VRAM_RESERVE_MIB}}",
+    "--kv-resident", "{{KV_RESIDENT}}",
+    "--mmap-experts",
+    "--conversation-cache-mib", "{{CONVO_CACHE_MIB}}",
+    "--conversation-cache-slots", "4",
+    "--conversation-cache-min-tokens", "128",
+    "--conversation-cache-park-gain", "512"
+  ],
+  "cwd": "{{ROOT}}/Strata",
+  "tokenizer": "{{DATA_DIR}}/packs/q2_0/tokenizer",
+  "model_name": "{{DATA_DIR}}/models/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+  "log": "{{ROOT}}/logs/strata-q2_0.log",
+  "lib_dirs": ["{{CUDA_DIR}}/bin", "{{CUDA_DIR}}/lib64"],
+  "port": {{PORT}},
+  "gpu": 0,
+  "gpus_asked": true
+}

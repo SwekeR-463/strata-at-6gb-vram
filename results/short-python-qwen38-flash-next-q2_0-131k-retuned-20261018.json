@@ -1,0 +1,90 @@
+{
+  "model_id": "qwen38-flash-next-q2_0",
+  "model_file": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+  "server_model": " /home/<user>/work/strata-at-6gb-vram/Strata-data/models/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+  "suite_id": "short-python-v1",
+  "run_at": "2026-10-18T00:10:21+0530",
+  "sampling_mode": "greedy",
+  "sampling": {
+    "temperature": 0,
+    "chat_template_kwargs": {
+      "reasoning_effort": "low"
+    }
+  },
+  "settings": {
+    "temperature": 0,
+    "seed": 42,
+    "max_tokens": 1024,
+    "reasoning_effort": "low"
+  },
+  "total": 6,
+  "passed": 6,
+  "tasks": [
+    {
+      "task": "merge-intervals",
+      "passed": true,
+      "response": "merge-intervals-response.json",
+      "candidate": "merge-intervals.py",
+      "evaluation": "merge-intervals-evaluation.log",
+      "finish_reason": "stop",
+      "prompt_tokens": 103,
+      "completion_tokens": 630,
+      "generation_tokens_per_second": 8.1
+    },
+    {
+      "task": "binary-metrics",
+      "passed": true,
+      "response": "binary-metrics-response.json",
+      "candidate": "binary-metrics.py",
+      "evaluation": "binary-metrics-evaluation.log",
+      "finish_reason": "stop",
+      "prompt_tokens": 130,
+      "completion_tokens": 852,
+      "generation_tokens_per_second": 7.1
+    },
+    {
+      "task": "flatten-dict",
+      "passed": true,
+      "response": "flatten-dict-response.json",
+      "candidate": "flatten-dict.py",
+      "evaluation": "flatten-dict-evaluation.log",
+      "finish_reason": "stop",
+      "prompt_tokens": 119,
+      "completion_tokens": 683,
+      "generation_tokens_per_second": 8.1
+    },
+    {
+      "task": "dependency-order",
+      "passed": true,
+      "response": "dependency-order-response.json",
+      "candidate": "dependency-order.py",
+      "evaluation": "dependency-order-evaluation.log",
+      "finish_reason": "stop",
+      "prompt_tokens": 116,
+      "completion_tokens": 839,
+      "generation_tokens_per_second": 8.2
+    },
+    {
+      "task": "parse-env",
+      "passed": true,
+      "response": "parse-env-response.json",
+      "candidate": "parse-env.py",
+      "evaluation": "parse-env-evaluation.log",
+      "finish_reason": "stop",
+      "prompt_tokens": 133,
+      "completion_tokens": 667,
+      "generation_tokens_per_second": 7.8
+    },
+    {
+      "task": "batch-iterable",
+      "passed": true,
+      "response": "batch-iterable-response.json",
+      "candidate": "batch-iterable.py",
+      "evaluation": "batch-iterable-evaluation.log",
+      "finish_reason": "stop",
+      "prompt_tokens": 123,
+      "completion_tokens": 646,
+      "generation_tokens_per_second": 7.8
+    }
+  ]
+}

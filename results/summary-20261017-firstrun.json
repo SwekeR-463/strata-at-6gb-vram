@@ -1,0 +1,57 @@
+{
+  "project": "strata-at-6gb-vram",
+  "model": "qwen3.8-flash-next-q2_0",
+  "model_files": {
+    "shard1": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf (37623740192 B)",
+    "shard2": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf (28800138432 B)",
+    "source": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF",
+    "pack": "Strata-data/packs/q2_0 (experts.bin 33973862400 B, dense.bin 1485606400 B)"
+  },
+  "engine": {
+    "name": "Strata (Niko1221/Strata @ main)",
+    "version": "0.1.45",
+    "built": "from source, CUDA 12.8, sm_89",
+    "runner": "serve/server.py --port 8097",
+    "config_args": "--pack ... --native shard1 --ple-gguf shard2 --expert-profile ... --expert-cache auto --prefill auto --spec 4 --spec-min-p 0.5 --max-context 16384 --kv int8 --mmap-experts  (no --mtp)"
+  },
+  "machine": {
+    "gpu": "RTX 4050 Laptop, 6 GB, sm_89, driver 580.178.04, PCIe 4.0 x8 (11.1 GB/s host->device measured)",
+    "cpu": "i5-13420H, 8C/12T, AVX2 (no AVX-512)",
+    "ram_gb": 15,
+    "swap_gb": 4,
+    "os": "Ubuntu 24.04"
+  },
+  "date": "2026-10-17",
+  "results": {
+    "decode_tok_s": [8.5, 9.9, 9.0, 8.0, 8.9],
+    "decode_steady_tok_s": 9.0,
+    "prefill_cold_293_tok_s": 16.4,
+    "prefill_warm_reused_tok_s": 53.6,
+    "prefill_small_prompt_tok_s": [10.4, 17.0, 24.7],
+    "expert_cache_hit_rate_pct": [24.7, 28.5, 30.9, 38.8],
+    "expert_cache_slots": 344,
+    "total_experts": 24576,
+    "ssd_mb_per_generated_token": [82.8, 88.5],
+    "ssd_sustained_gbps": 1.5,
+    "expert_bytes_per_request_gb": [18.9, 27.8],
+    "rss_gib": 7.9,
+    "swap_mib": 210,
+    "vram_used_mib": 4718,
+    "vram_free_mib": [146, 284],
+    "suffix_drafts_accepted": ["3/5", "3/12", "7/7"]
+  },
+  "engine_notes": {
+    "tail_skip": "STRATA_ROUTE_TAIL_SKIP=7 ON (skips low-rank missed experts; approximation)",
+    "pcie_frac_auto": "0.30 -> 0.60 (CPU pool 392 us per missed expert)",
+    "prefill_cpu_share": "off (31.2 GiB of file pages vs 7.6 GiB free RAM)",
+    "vram_warning": "146-284 MiB free; engine suggests --vram-reserve-mib 896 or smaller context (#2065)"
+  },
+  "reference_reddit_box": {
+    "gpu": "RTX 3070 8 GB, 32 GB DDR4",
+    "decode_tok_s": 36,
+    "prefill_tok_s": 340,
+    "context": 176128,
+    "experts_cached": 2000,
+    "mtp": "off (sacrificed)"
+  }
+}

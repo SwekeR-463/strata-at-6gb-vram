@@ -1,0 +1,45 @@
+{
+  "base_url": "http://127.0.0.1:8097",
+  "model": "qwen3.8-flash-next-q2_0",
+  "started": "2026-10-17T21:08:36+0530",
+  "protocol": "temperature 0, stream off, wall-clock timed",
+  "requests": [
+    {
+      "name": "prefill_long",
+      "wall_s": 18.014,
+      "prompt_tokens": 293,
+      "completion_tokens": 1,
+      "note": "long prompt, 1 token out",
+      "tok_s_end_to_end": 0.06
+    },
+    {
+      "name": "decode_long",
+      "wall_s": 4.494,
+      "prompt_tokens": 293,
+      "completion_tokens": 35,
+      "note": "same prompt, generate",
+      "tok_s_end_to_end": 7.79
+    },
+    {
+      "name": "decode_short",
+      "wall_s": 10.918,
+      "prompt_tokens": 59,
+      "completion_tokens": 48,
+      "note": "short prompt",
+      "tok_s_end_to_end": 4.4
+    }
+  ],
+  "memory": {
+    "before": {
+      "mem_available_mib": 7207,
+      "swap_used_mib": 4068
+    },
+    "after": {
+      "mem_available_mib": 7156,
+      "swap_used_mib": 4095
+    }
+  },
+  "prefill_tok_s": 16.3,
+  "decode_tok_s_after_long_prefill": 34000.0,
+  "decode_tok_s_short_prompt": 4.4
+}

@@ -1,0 +1,37 @@
+diff --git a/setup.py b/setup.py
+index 3dd2ca5..f453254 100644
+--- a/setup.py
++++ b/setup.py
+@@ -1609,6 +1609,11 @@ def drop_archive(z: Path) -> None:
+     z.with_name(z.name + ".done").unlink(missing_ok=True)
+ 
+ 
++# [strata-at-6gb-vram] Cap the download rate so a 60+ GB model pull stays under the
++# link's budget. MiB/s; 0 disables. Override with STRATA_DOWNLOAD_MAX_MIBPS.
++DL_MAX_BPS = int(float(os.environ.get("STRATA_DOWNLOAD_MAX_MIBPS", "3.5")) * 1048576)
++
++
+ def download(url, dst: Path, what=None):
+     """Resumable HTTP(S) download with a progress line; `file://` and plain paths are copied (tests, mirrors).
+     A finished file gets a <name>.done mark, so a later run skips it without asking the server."""
+@@ -1669,12 +1674,19 @@ def download(url, dst: Path, what=None):
+                     f.truncate()
+                     have = 0
+                 last = 0.0
++                conn_start = time.monotonic()  # [strata-at-6gb-vram] rate cap below
++                conn_bytes = 0
+                 while True:
+-                    b = r.read(8 << 20)
++                    b = r.read(1 << 20)
+                     if not b:
+                         break
+                     f.write(b)
+                     have += len(b)
++                    conn_bytes += len(b)
++                    if DL_MAX_BPS:
++                        wait = conn_bytes / DL_MAX_BPS - (time.monotonic() - conn_start)
++                        if wait > 0:
++                            time.sleep(wait)
+                     if time.time() - last > 2:
+                         last = time.time()
+                         size = f"{have / 1e9:6.2f} / {total / 1e9:.2f} GB ({100 * have / total:.0f}%)" if total \

@@ -1,0 +1,46 @@
+{
+  "project": "strata-at-6gb-vram",
+  "note": "Model data is deliberately NOT in this repo (102 GB). This manifest is the record of what every measurement in results/ was run against.",
+  "model": "Qwen3.8-Flash-Next (177B MoE), Q2_0 2.25-bit GGUF, GSQ-RCO quant",
+  "source_repo": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF",
+  "files": {
+    "shard1": {
+      "path": "Strata-data/models/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+      "bytes": 37623740192,
+      "role": "native weights (dense + routed experts), passed as --native"
+    },
+    "shard2": {
+      "path": "Strata-data/models/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+      "bytes": 28800138432,
+      "role": "PLE n-gram table + tokenizer, passed as --ple-gguf"
+    },
+    "pack_experts": {
+      "path": "Strata-data/packs/q2_0/experts.bin",
+      "bytes": 33973862400,
+      "role": "prepared expert set, mmap-streamed from NVMe (24,576 experts)"
+    },
+    "pack_dense": {
+      "path": "Strata-data/packs/q2_0/dense.bin",
+      "bytes": 1485606400,
+      "role": "dense weights resident in VRAM"
+    },
+    "expert_profile": {
+      "path": "Strata/data/expert-profile.bin",
+      "bytes": null,
+      "role": "routing-frequency profile that seeds the adaptive expert cache (shipped with the engine)"
+    },
+    "mtp_draft": {
+      "path": "Strata-data/mtp",
+      "bytes": null,
+      "role": "draft layer (~5 GB) downloaded by setup.sh but NOT used: --mtp is dropped on this box"
+    }
+  },
+  "total_disk_footprint_gb": 96,
+  "engine": {
+    "name": "Strata (Niko1221/Strata)",
+    "version": "0.1.45",
+    "revision": "b95137167bd9b751",
+    "built": "from source, CUDA 12.8, CMAKE_CUDA_ARCHITECTURES=89, -DSTRATA_MMQ_KQUANTS=ON -DSTRATA_Q6K_EXPERTS=ON",
+    "license": "MIT (upstream)"
+  }
+}

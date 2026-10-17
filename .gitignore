@@ -1,0 +1,23 @@
+# Engine checkout and build artifacts — upstream code, obtained by scripts/build.sh
+Strata/
+!Strata/.gitignore
+
+# Model data: 102 GB of shards, packs and MTP draft. See data/MANIFEST.json.
+Strata-data/
+
+# Runtime logs; the setup transcript is kept as evidence
+logs/server-console.log
+logs/strata-q2_0.log
+*.log
+!logs/setup-q2_0-20261017.log
+
+# Local, machine-specific state
+.port
+*.bak
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Anything a generated config writes at run time
+config/strata-q2_0.json
