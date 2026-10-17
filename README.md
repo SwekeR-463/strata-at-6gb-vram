@@ -16,6 +16,10 @@ context with pinned host RAM instead of VRAM, and **conversation parking**
 (`--conversation-cache-mib 1024`) turns a 107 s agent turn into a 1–2 s one. Everything else is
 Strata doing what Strata does.
 
+**Contents:** [Machine](#machine) · [Quick start](#quick-start) · [Methodology](#methodology) ·
+[Results](#results) · [Reproducing on another box](#reproducing-on-a-different-box) ·
+[Status](#status) · [License and credit](#license-and-credit)
+
 ## Machine
 
 | | |
@@ -216,7 +220,7 @@ that justified it.
 | 6 | conversation parking | off (`--conversation-cache-mib 0`) | `1024 MiB`, 4 slots, `min-tokens 128`, `park-gain 512` | without it every agent turn re-reads the whole conversation from SSD | a 5.2k-token turn: **107 s → 1–2 s** (5,208 of 5,229 tokens reused) |
 | 7 | VRAM reclaimed | — | closed an unrelated app (`tern`, 892 MiB) | the cache is sized by what is actually free | expert cache 344 → **599 slots** |
 | 8 | download | unthrottled | `download-throttle.patch` → 3.5 MiB/s | keep a 66 GB pull inside the link's 4 MiB/s limit | 66 GB pulled without saturating the link |
-| 9 | port | 8080 | **8097** (in `.port` and `scripts/run.sh`) | SearXNG owns 8080 on this box, kubectl port-forwards own 8081–8082 | environment detail, not a tuning win |
+| 9 | port | 8080 | **8097** (`PORT` in `scripts/run.sh`) | SearXNG owns 8080 on this box, kubectl port-forwards own 8081–8082 | environment detail, not a tuning win |
 
 #### Delta 3 in detail: the context ladder nobody would have guessed
 
