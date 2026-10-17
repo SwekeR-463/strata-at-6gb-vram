@@ -22,7 +22,8 @@ SSD-streaming low-RAM mode.
 ## Where things are
 
 - `README.md` - goal, quick start, **Methodology** (data path + mermaid, what Strata does vs what
-  we changed, rejected levers, how each number was measured, limits), results, status
+  we changed, rejected levers, how each number was measured, limits), results
+- `LOG.md` - the running record: timeline, open items, fallbacks (same model only)
 - `results.md` - short-python-v1 per-task tables; `results/` - raw JSON/CSV of every run
 - `scripts/build.sh` / `scripts/run.sh` - reproduce the exact stack (engine rev `b95137167bd9b751`,
   tuned flags from `config/strata-q2_0.json.template`)
