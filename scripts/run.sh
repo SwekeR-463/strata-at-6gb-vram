@@ -5,7 +5,8 @@
 # the tuning flags are explicit in one place (Methodology §3 of the README) instead of
 # buried in an absolute path written by setup.sh.
 #
-# Env: ROOT, DATA_DIR, PORT, CONTEXT, VRAM_RESERVE_MIB, KV_RESIDENT, CONVO_CACHE_MIB, CUDA_DIR
+# Env: ROOT, DATA_DIR, PORT, CONTEXT, VRAM_RESERVE_MIB, KV_RESIDENT, CONVO_CACHE_MIB,
+#      EXPERT_PROFILE, CUDA_DIR
 #
 # Examples:
 #   ./scripts/run.sh                                  # this box: :8097, 131k context
@@ -15,6 +16,7 @@ set -euo pipefail
 
 ROOT="${ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 DATA_DIR="${DATA_DIR:-$ROOT/Strata-data}"
+EXPERT_PROFILE="${EXPERT_PROFILE:-$ROOT/Strata/data/expert-profile.bin}"
 PORT="${PORT:-8097}"
 CONTEXT="${CONTEXT:-131072}"
 VRAM_RESERVE_MIB="${VRAM_RESERVE_MIB:-512}"
@@ -24,11 +26,13 @@ CUDA_DIR="${CUDA_DIR:-/usr/local/cuda-12.8}"
 
 [ -x "$ROOT/Strata/engine/strata" ] || { echo "engine not built. run ./scripts/build.sh first" >&2; exit 1; }
 [ -d "$DATA_DIR/packs/q2_0" ] || { echo "no pack at $DATA_DIR/packs/q2_0. run ./scripts/build.sh first" >&2; exit 1; }
+[ -f "$EXPERT_PROFILE" ] || { echo "no expert profile at $EXPERT_PROFILE. run ./scripts/build.sh first, or point EXPERT_PROFILE at it" >&2; exit 1; }
 
 config="$ROOT/config/strata-q2_0.json"
 mkdir -p "$ROOT/config" "$ROOT/logs"
 sed -e "s|{{ROOT}}|$ROOT|g" \
     -e "s|{{DATA_DIR}}|$DATA_DIR|g" \
+    -e "s|{{EXPERT_PROFILE}}|$EXPERT_PROFILE|g" \
     -e "s|{{PORT}}|$PORT|g" \
     -e "s|{{CONTEXT}}|$CONTEXT|g" \
     -e "s|{{VRAM_RESERVE_MIB}}|$VRAM_RESERVE_MIB|g" \
@@ -40,6 +44,7 @@ sed -e "s|{{ROOT}}|$ROOT|g" \
 echo "config: $config"
 echo "  context=$CONTEXT  kv=int8  kv-resident=$KV_RESIDENT  vram-reserve=$VRAM_RESERVE_MIB MiB"
 echo "  parking=$CONVO_CACHE_MIB MiB  mmap experts  no --mtp  spec 4"
+echo "  expert profile: $EXPERT_PROFILE"
 echo "loading the model: the first start takes a minute or two, and the machine may stall for 1-3 minutes"
 echo "then: curl -s http://127.0.0.1:$PORT/health"
 

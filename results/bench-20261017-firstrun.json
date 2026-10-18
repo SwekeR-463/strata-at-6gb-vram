@@ -46,5 +46,18 @@
     "note": "Written 2026-10-17 by the pre-fix bench-strata.py. Values below are left exactly as emitted; this block annotates one of them rather than rewriting the record.",
     "decode_tok_s_after_long_prefill": "INVALID (34000.0). The old code subtracted request 1's wall (18.014 s) from request 2's (4.494 s); request 2 had reused request 1's prefix, so it never paid that prefill. The difference went negative and max(0.001, ...) turned it into 34/0.001. Correct value from the same run: 7.79 tok/s end to end (requests[1].tok_s_end_to_end). Fixed in tools/bench-strata.py, which now reads the server's timings block and never clamps a negative denominator.",
     "unaffected": "prefill_tok_s and decode_tok_s_short_prompt did not use the subtraction and stand as measured. The README's headline decode figures come from results/steady-1.json, steady-2.json and the short-python runs, not from this field."
+  },
+  "_provenance": {
+    "model_id": "qwen3.8-flash-next-q2_0",
+    "engine": "Strata",
+    "engine_version": "0.1.45",
+    "engine_revision": "477ac13cbe8e582c20484871ce459d20d82df09d",
+    "engine_tag": "v0.1.45",
+    "setup_transcript": "logs/setup-q2_0-20261017.log",
+    "annotated": "2026-10-18: added by the review that corrected the engine revision (BUILD.json's \"src\" is a source fingerprint, not a commit). The measurement itself is unchanged.",
+    "max_context": 16384,
+    "kv_resident": null,
+    "note": "no --kv-resident at 16k: the whole KV fits in VRAM",
+    "source": "results/summary-20261017-firstrun.json -> engine.config_args (first run, 21:08)"
   }
 }

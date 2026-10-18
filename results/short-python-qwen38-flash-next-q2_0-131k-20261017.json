@@ -86,5 +86,18 @@
       "completion_tokens": 646,
       "generation_tokens_per_second": 7.2
     }
-  ]
+  ],
+  "_provenance": {
+    "model_id": "qwen3.8-flash-next-q2_0",
+    "engine": "Strata",
+    "engine_version": "0.1.45",
+    "engine_revision": "477ac13cbe8e582c20484871ce459d20d82df09d",
+    "engine_tag": "v0.1.45",
+    "setup_transcript": "logs/setup-q2_0-20261017.log",
+    "annotated": "2026-10-18: added by the review that corrected the engine revision (BUILD.json's \"src\" is a source fingerprint, not a commit). The measurement itself is unchanged.",
+    "max_context": 131072,
+    "kv_resident": 32768,
+    "expert_cache_slots": 599,
+    "source": "LOG.md -> the 2026-10-17 22:45 timeline entry"
+  }
 }

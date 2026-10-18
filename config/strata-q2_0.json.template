@@ -4,7 +4,7 @@
     "--pack", "{{DATA_DIR}}/packs/q2_0",
     "--native", "{{DATA_DIR}}/models/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
     "--ple-gguf", "{{DATA_DIR}}/models/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
-    "--expert-profile", "{{ROOT}}/Strata/data/expert-profile.bin",
+    "--expert-profile", "{{EXPERT_PROFILE}}",
     "--expert-cache", "auto",
     "--prefill", "auto",
     "--spec", "4",

@@ -8,11 +8,13 @@
     "pack": "Strata-data/packs/q2_0 (experts.bin 33973862400 B, dense.bin 1485606400 B)"
   },
   "engine": {
-    "name": "Strata (Niko1221/Strata @ main)",
+    "name": "Strata (Niko1221/Strata)",
     "version": "0.1.45",
     "built": "from source, CUDA 12.8, sm_89",
     "runner": "serve/server.py --port 8097",
-    "config_args": "--pack ... --native shard1 --ple-gguf shard2 --expert-profile ... --expert-cache auto --prefill auto --spec 4 --spec-min-p 0.5 --max-context 16384 --kv int8 --mmap-experts  (no --mtp)"
+    "config_args": "--pack ... --native shard1 --ple-gguf shard2 --expert-profile ... --expert-cache auto --prefill auto --spec 4 --spec-min-p 0.5 --max-context 16384 --kv int8 --mmap-experts  (no --mtp)",
+    "revision": "477ac13cbe8e582c20484871ce459d20d82df09d",
+    "tag": "v0.1.45"
   },
   "machine": {
     "gpu": "RTX 4050 Laptop, 6 GB, sm_89, driver 580.178.04, PCIe 4.0 x8 (11.1 GB/s host->device measured)",

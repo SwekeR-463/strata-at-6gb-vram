@@ -27,15 +27,15 @@ The running record of the experiment. For the design, the tuning and the measure
   `--kv-resident` to its 20,480 minimum) → **chunk 512 → 1280, cache 599 → 856 slots**, cold prefill
   **41.6 → 51–54 tok/s** (+23–30%). Rejected `--expert-cache-per-layer` (neutral: our cache is
   profile-filled, not arrival-order) and `--resident-cpu-experts` (engine declines it; swap hit 100%).
+- **2026-10-18 00:10** — **short-python-v1 re-run at 131k on the retuned config: 6/6 at 7.81 tok/s**
+  (run 2: 7.40), all `finish_reason=stop`, 4,317 generated tokens. The +5.5% is the bigger cache (856
+  slots, ~50% hit rate inside a request vs ~44% at 599 slots).
 - **2026-10-18 00:20** — **conversation parking enabled** (`--conversation-cache-mib 1024
   --conversation-cache-slots 4 --conversation-cache-min-tokens 128 --conversation-cache-park-gain
   512`). Parking is off by default, and it is the difference that matters for an agent: a cold
   5.2k-token turn costs 107 s, and every turn after it **1–2 s** (5,208 of 5,229 prompt tokens reused)
   instead of another 107 s. ~429 MB of parked RAM per 5.2k conversation; `park-gain 512` stops each
   turn from writing a fresh snapshot (3 evictions of the 1,024 MiB budget in 3 turns without it).
-- **2026-10-18 00:10** — **short-python-v1 re-run at 131k on the retuned config: 6/6 at 7.81 tok/s**
-  (run 2: 7.40), all `finish_reason=stop`, 4,317 generated tokens. The +5.5% is the bigger cache (856
-  slots, ~50% hit rate inside a request vs ~44% at 599 slots).
 
 - **2026-10-18 14:04** — **review repairs to the packaged repo** (nothing about the engine or the
   tuning changed; the running server was stopped before these edits). Two defects found while
@@ -57,6 +57,26 @@ The running record of the experiment. For the design, the tuning and the measure
   3. Units disclaimers, a stale tool default and the `results/` provenance fields are **still
      open** — see Open items.
 
+- **2026-10-18 14:25** — **repo shared, then the remaining open items closed.** Pushed to a private
+  remote (`the private remote`, branch `main`), then:
+  1. **Units declared.** `data/MANIFEST.json`'s `total_disk_footprint_gb: 96` — a figure that was
+     really 101.9 GB *or* 94.9 GiB depending on which unit you assumed — is now a
+     `total_disk_footprint` block carrying `bytes`, `gb_decimal`, `gib`, the measured on-disk value
+     and the excluded 6.93 GB MTP draft. README states the convention and labels the figures.
+  2. **`tools/bench-strata.py` defaults to `:8097`** like everything else; the README example no
+     longer has to pass `--base-url`.
+  3. **`results/` provenance.** All nine JSONs now carry the engine revision — the four raw curl
+     captures and the bench file got a `_provenance` block, the summary's `engine` block got
+     `revision`/`tag`, and the three suite runs also name their own config (`--max-context`, plus
+     `kv_resident` where it applied) with a pointer to where that config is recorded. Verified
+     byte-for-byte that no measured value changed.
+  4. **`EXPERT_PROFILE` is now real.** The README had documented an env var `run.sh` never read.
+     The template takes `{{EXPERT_PROFILE}}`, `run.sh` defaults it to
+     `Strata/data/expert-profile.bin` and fails loudly if it is missing.
+  5. **`scripts/stop.sh`** — stops the server on `PORT` and the engine with it, refuses to kill a
+     listener that is not Strata (so `PORT=8080`, which is SearXNG here, is a no-op), and reports
+     the GPU/RAM it handed back. `LOG.md`'s `00:10` entry was also filed after `00:20`; fixed.
+
 ## Open items
 
 - **Run 1 vs run 2 is not a clean A/B.** ~80 min and a long session apart; a back-to-back 16k/131k
@@ -67,16 +87,6 @@ The running record of the experiment. For the design, the tuning and the measure
   next to the llama.cpp CPU-MoE numbers (Gemopus-4-26B 5/6, KAT-Coder V2.5 4/6) on the same box.
 - **PLE table** — the output-side n-gram lookup is read unbuffered (`--ple-io direct`) and is drawn
   in the data path but never profiled separately. Worth a `stream-stat.sh` run isolated to it.
-- **Units are undeclared in the write-up.** The README mixes GB and GiB ("~63 GB model" vs the
-  "66.4 GB download", "63 GB of GGUFs + 33 GB pack" vs `MANIFEST.total_disk_footprint_gb: 96` for
-  what is 101.9 GB decimal / 94.9 GiB on disk). Each figure is roughly right; a reader cannot tell
-  which unit is meant. Pick one (GiB) and label the table.
-- **`tools/bench-strata.py` still defaults to `--base-url …:8080`** while `run.sh` and
-  `reuse-test.py` default to 8097 — a bare invocation on this box reaches SearXNG. The README
-  example passes the flag, so it is a paper cut, not a wrong number.
-- **`results/` does not carry the engine commit**, which `AGENTS.md` asks for: the summary JSON says
-  only `"Strata (Niko1221/Strata @ main)"`. `results/bench-20261017-firstrun.json` was written
-  before the tool recorded any provenance at all.
 
 ## Fallbacks (same model only)
 

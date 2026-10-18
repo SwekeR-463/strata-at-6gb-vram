@@ -35,7 +35,14 @@
       "role": "draft layer (~5 GB) downloaded by setup.sh but NOT used: --mtp is dropped on this box"
     }
   },
-  "total_disk_footprint_gb": 96,
+  "total_disk_footprint": {
+    "bytes": 101883347424,
+    "gb_decimal": 101.88,
+    "gib": 94.89,
+    "unit_note": "gb_decimal = 1e9 bytes, gib = 2^30 bytes; both are given because the write-up used to mix them.",
+    "measured_on_disk_20261018": "101,893,290,735 bytes = 101.89 GB = 94.90 GiB (the ~9.9 MB difference from 'bytes' above is pack-directory metadata)",
+    "excludes": "the MTP draft, 6,927,659,014 bytes = 6.93 GB (6.45 GiB), in Strata-data/mtp: setup.sh downloads it, this project does not use it (--mtp is dropped on this box)"
+  },
   "engine": {
     "name": "Strata (Niko1221/Strata)",
     "version": "0.1.45",

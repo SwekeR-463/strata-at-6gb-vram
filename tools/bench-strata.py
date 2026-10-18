@@ -2,7 +2,7 @@
 """bench-strata.py - minimal benchmark for a running Strata server (OpenAI-compatible API).
 
 Usage:
-  tools/bench-strata.py [--base-url http://127.0.0.1:8080] [--out results/bench.json] [--wait 600]
+  tools/bench-strata.py [--base-url http://127.0.0.1:8097] [--out results/bench.json] [--wait 600]
 
 Three requests against /v1/chat/completions, temperature 0:
   1. long prompt (~--fill-tokens), max_tokens=1   -> prefill rate
@@ -73,7 +73,7 @@ def sample_mem():
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--base-url", default="http://127.0.0.1:8080")
+    ap.add_argument("--base-url", default="http://127.0.0.1:8097")
     ap.add_argument("--model", default="qwen3.8-flash-next-q2_0")
     ap.add_argument("--fill-tokens", type=int, default=1024)
     ap.add_argument("--max-tokens", type=int, default=256)

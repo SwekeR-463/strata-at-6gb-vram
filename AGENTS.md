@@ -14,7 +14,9 @@ SSD-streaming low-RAM mode.
   Never trust defaults here; every claim needs measurement:
   `tools/stream-stat.sh` (SSD bytes/token, swap, page faults) and `tools/bench-strata.py`.
 - Results are machine-readable JSON including the model ID, the exact engine args, the
-  engine/commit revision, and the setup transcript reference.
+  engine/commit revision, and the setup transcript reference. Every file in `results/`
+  carries a `_provenance` block with `model_id`, `engine_revision`, the setup transcript and
+  a pointer to where that run's own config is recorded; keep it up on new runs.
 - `Strata-data/` is huge and resumable: never re-download shards that are present.
 - Swap is ~100% used and there is no sudo: no assumptions that extra swap or kernel
   tuning is available.
@@ -25,10 +27,10 @@ SSD-streaming low-RAM mode.
   we changed, rejected levers, how each number was measured, limits), results
 - `LOG.md` - the running record: timeline, open items, fallbacks (same model only)
 - `results.md` - short-python-v1 per-task tables; `results/` - raw JSON/CSV of every run
-- `scripts/build.sh` / `scripts/run.sh` - reproduce the exact stack (engine commit
+- `scripts/build.sh` / `scripts/run.sh` / `scripts/stop.sh` - reproduce the exact stack (engine commit
   `477ac13cbe8e582c20484871ce459d20d82df09d`, tag `v0.1.45`, tuned flags from
   `config/strata-q2_0.json.template`). Note: `Strata/engine/BUILD.json`'s `"src"` is a source
   fingerprint, not a revision.
-- `data/MANIFEST.json` - the model files every measurement used (102 GB, not in the repo)
+- `data/MANIFEST.json` - the model files every measurement used (101.9 GB / 94.9 GiB, not in the repo)
 - `logs/` - setup transcript and server console (evidence); `docs/strata-engine-help.txt` - engine flag reference
 - `Strata/` - the engine checkout (gitignored, upstream MIT); `Strata-data/` - shards, packs, MTP (gitignored)

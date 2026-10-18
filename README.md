@@ -31,6 +31,10 @@ Strata doing what Strata does.
 | Disk | NVMe, ~140 GB free at setup time |
 | OS | Ubuntu 24.04, Python 3.12, CUDA 12.8 toolkit |
 
+**Units:** figures here are decimal — **GB = 10⁹ bytes** — and anything binary says **GiB**
+(2³⁰ bytes). Both are given for the model footprints, because an earlier draft mixed the two
+(`data/MANIFEST.json → total_disk_footprint` now carries bytes, GB and GiB side by side).
+
 ## Quick start
 
 ```bash
@@ -38,9 +42,10 @@ git clone https://github.com/Niko1221/Strata Strata
 cd Strata && git checkout 477ac13cbe8e582c20484871ce459d20d82df09d   # v0.1.45
 cd ..
 
-./scripts/build.sh    # pin the engine, then download + prepare the weights (~102 GB)
-./scripts/run.sh      # start the server on :8097
-./tools/bench-strata.py --base-url http://127.0.0.1:8097 --wait 600
+./scripts/build.sh    # pin the engine, then download + prepare the weights (101.9 GB / 94.9 GiB)
+./scripts/run.sh      # start the server on :8097 (foreground; Ctrl-C stops it)
+./tools/bench-strata.py --wait 600             # :8097 by default
+./scripts/stop.sh     # or stop it from another shell — the engine goes with the server
 ```
 
 `scripts/run.sh` writes the tuned launch config (the exact flags in *Methodology §3*) from
@@ -52,10 +57,14 @@ cd ..
 | `DATA_DIR` | `$ROOT/Strata-data` | shards, packs, MTP draft |
 | `PORT` | `8097` | this box uses 8097 because SearXNG owns 8080 and kubectl port-forwards own 8081–8082; pick any free port on yours |
 | `CONTEXT` | `131072` | `--max-context` |
-| `EXPERT_PROFILE` | `Strata/data/expert-profile.bin` | routing-frequency profile that seeds the cache |
+| `VRAM_RESERVE_MIB` | `512` | `--vram-reserve-mib` — the risky one; free VRAM is what becomes cache slots and chunk buffers |
+| `KV_RESIDENT` | `20480` | `--kv-resident` (its documented minimum) — how much KV sits in VRAM, the rest streams from pinned RAM |
+| `CONVO_CACHE_MIB` | `1024` | `--conversation-cache-mib`; `0` = parking off, which reproduces runs 1 and 2 |
+| `EXPERT_PROFILE` | `Strata/data/expert-profile.bin` | routing-frequency profile that seeds the cache (ships with the engine) |
+| `CUDA_DIR` | `/usr/local/cuda-12.8` | only used by `build.sh` |
 
-Model data is **not** in the repo (102 GB). `data/MANIFEST.json` lists the exact files the setup
-downloaded and prepared, so you can verify a run against the same weights.
+Model data is **not** in the repo (101.9 GB / 94.9 GiB). `data/MANIFEST.json` lists the exact files
+the setup downloaded and prepared, so you can verify a run against the same weights.
 
 ## Setup verdict
 
@@ -94,7 +103,7 @@ README.md                      goal, quick start, methodology, results
 LOG.md                         the running record: timeline, fallbacks, open items
 results.md                     short-python-v1 runs, per task, with attribution
 config/                        the tuned launch config (template)
-scripts/                       build.sh, run.sh — reproduce the exact stack
+scripts/                       build.sh, run.sh, stop.sh — reproduce the exact stack
 tools/                         bench-strata.py, reuse-test.py, stream-stat.sh
 data/MANIFEST.json             the model files this project used (names, sizes, source)
 logs/                          setup transcript and server console (evidence)
