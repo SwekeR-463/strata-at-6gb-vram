@@ -57,8 +57,8 @@ The running record of the experiment. For the design, the tuning and the measure
   3. Units disclaimers, a stale tool default and the `results/` provenance fields are **still
      open** — see Open items.
 
-- **2026-10-18 14:25** — **repo shared, then the remaining open items closed.** Pushed to a private
-  remote (`the private remote`, branch `main`), then:
+- **2026-10-18 14:25** — **repo shared, then the remaining open items closed.** Pushed to the private remote
+  (`origin`, branch `main`), then:
   1. **Units declared.** `data/MANIFEST.json`'s `total_disk_footprint_gb: 96` — a figure that was
      really 101.9 GB *or* 94.9 GiB depending on which unit you assumed — is now a
      `total_disk_footprint` block carrying `bytes`, `gb_decimal`, `gib`, the measured on-disk value

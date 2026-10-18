@@ -25,11 +25,11 @@ Strata doing what Strata does.
 
 | | |
 |---|---|
-| GPU | RTX 4050 Laptop, 6 GB VRAM, sm_89, driver 580.178.04, PCIe 4.0 x8 |
+| GPU | 6 GB NVIDIA laptop GPU, `sm_89`, PCIe 4.0 x8 |
 | RAM | 15 GB + 4 GB swap (swap was ~100% used before this experiment) |
-| CPU | i5-13420H, 8C/12T, AVX2 (no AVX-512) |
-| Disk | NVMe, ~140 GB free at setup time |
-| OS | Ubuntu 24.04, Python 3.12, CUDA 12.8 toolkit |
+| CPU | 8C/12T x86-64, AVX2 (no AVX-512) |
+| Disk | NVMe, ~1.9 GB/s measured |
+| OS | Linux, Python 3.12, CUDA 12.8 toolkit |
 
 **Units:** figures here are decimal — **GB = 10⁹ bytes** — and anything binary says **GiB**
 (2³⁰ bytes). Both are given for the model footprints, because an earlier draft mixed the two
@@ -345,7 +345,7 @@ Strata's OpenAI-compatible surface exactly as a real client would.
 
 ### 6. What this methodology cannot claim
 
-- **One box, one session.** All numbers are from a single RTX 4050 Laptop / 15 GB machine on one
+- **One box, one session.** All numbers are from a single 6 GB / 15 GB laptop on one
   day. No cross-hardware validation.
 - **Run 1 vs run 2 is not a clean A/B.** Run 1 (16k) ran ~80 min earlier in a long session, so part
   of the −24% could be thermal drift rather than the KV mode. A back-to-back A/B would separate

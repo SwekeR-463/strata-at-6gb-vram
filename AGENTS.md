@@ -1,8 +1,8 @@
 # strata-at-6gb-vram
 
 Out-of-tree experiment, deliberately **separate from the `local=lm` workbench**: run
-Qwen3.8-Flash-Next on the RTX 4050 Laptop (6 GB VRAM) + 15 GB RAM box through Strata's
-SSD-streaming low-RAM mode.
+Qwen3.8-Flash-Next on a 6 GB VRAM + 15 GB RAM laptop through Strata's SSD-streaming
+low-RAM mode.
 
 ## Rules
 

@@ -7,7 +7,7 @@ All numbers below were measured on **this** stack, end to end:
 | Model | **Qwen3.8 Flash Next Q2_0** (ISTA GSQ-RCO GGUF, 2-bit experts), 2 shards, 66.4 GB — the only model used in this project |
 | Engine | **[Strata](https://github.com/Niko1221/Strata) 0.1.45** — built from source for `sm_89` / CUDA 12.8 (no prebuilt binary for v0.1.45), expert profile + adaptive expert cache |
 | Serving | Strata's OpenAI-compatible server, `127.0.0.1:8097/v1` — `--mmap-experts` (experts read from the file tier), `--kv int8`, KV streamed via `--kv-resident`, `--prefill auto`, `--spec 4` |
-| Hardware | RTX 4050 Laptop, **6 GB VRAM**, 15.6 GB RAM, NVMe measured at ~1.9 GB/s |
+| Hardware | 6 GB VRAM NVIDIA laptop GPU, 15.6 GB RAM, NVMe measured at ~1.9 GB/s |
 | Harness | `local=lm` → `scripts/benchmark-code.sh`, suite **short-python-v1** |
 | Protocol | greedy — `temperature 0`, `reasoning_effort low`, `max_tokens 1024`, `seed 42` |
 | Grading | 6 Python tasks; the code block is extracted from the reply, executed, and its output compared against the expected result |

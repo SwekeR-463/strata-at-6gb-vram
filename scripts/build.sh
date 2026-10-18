@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # build.sh - get the engine this project was measured on and build it for this GPU.
 #
-# Strata ships prebuilt binaries for common cards; there was none for v0.1.45 on an
-# RTX 4050 Laptop (sm_89), so the engine is compiled from source. This script records
+# Strata ships prebuilt binaries for common cards; there was none for v0.1.45 on a
+# 6 GB laptop GPU (sm_89), so the engine is compiled from source. This script records
 # exactly that path so a reader can reproduce it.
 #
 # Env: CUDA_DIR (default /usr/local/cuda-12.8), CUDA_ARCH (default 89), REV (default 477ac13c...)

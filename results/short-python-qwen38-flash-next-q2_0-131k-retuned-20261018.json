@@ -1,7 +1,7 @@
 {
   "model_id": "qwen38-flash-next-q2_0",
   "model_file": "Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
-  "server_model": " /home/<user>/work/strata-at-6gb-vram/Strata-data/models/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+  "server_model": "Strata-data/models/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
   "suite_id": "short-python-v1",
   "run_at": "2026-10-18T00:10:21+0530",
   "sampling_mode": "greedy",
@@ -99,6 +99,7 @@
     "kv_resident": 20480,
     "vram_reserve_mib": 512,
     "expert_cache_slots": 856,
-    "source": "LOG.md -> the 2026-10-18 00:02 timeline entry (the VRAM retune)"
+    "source": "LOG.md -> the 2026-10-18 00:02 timeline entry (the VRAM retune)",
+    "server_model_redaction": "the recorded absolute path was rewritten to repo-relative on 2026-10-18 (the local home-directory prefix removed); the file is data/MANIFEST.json -> files.shard1"
   }
 }

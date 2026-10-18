@@ -17,11 +17,11 @@
     "tag": "v0.1.45"
   },
   "machine": {
-    "gpu": "RTX 4050 Laptop, 6 GB, sm_89, driver 580.178.04, PCIe 4.0 x8 (11.1 GB/s host->device measured)",
-    "cpu": "i5-13420H, 8C/12T, AVX2 (no AVX-512)",
+    "gpu": "6 GB NVIDIA laptop GPU, sm_89, PCIe 4.0 x8 (11.1 GB/s host->device measured)",
+    "cpu": "8C/12T x86-64, AVX2 (no AVX-512)",
     "ram_gb": 15,
     "swap_gb": 4,
-    "os": "Ubuntu 24.04"
+    "os": "Linux"
   },
   "date": "2026-10-17",
   "results": {
