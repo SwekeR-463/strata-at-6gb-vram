@@ -35,10 +35,11 @@ Strata doing what Strata does.
 
 ```bash
 git clone https://github.com/Niko1221/Strata Strata
-cd Strata && git checkout b95137167bd9b751          # the revision this project was built on
+cd Strata && git checkout 477ac13cbe8e582c20484871ce459d20d82df09d   # v0.1.45
 cd ..
-./scripts/build.sh                                   # compile the engine for sm_89 / CUDA 12.8
-./scripts/run.sh                                     # start the server on :8097
+
+./scripts/build.sh    # pin the engine, then download + prepare the weights (~102 GB)
+./scripts/run.sh      # start the server on :8097
 ./tools/bench-strata.py --base-url http://127.0.0.1:8097 --wait 600
 ```
 
@@ -214,7 +215,7 @@ that justified it.
 
 | # | Lever | Strata default | What we set | Why | Measured effect |
 |---|---|---|---|---|---|
-| 1 | build | prebuilt binaries | compile from source, `sm_89`, CUDA 12.8, `-DSTRATA_MMQ_KQUANTS=ON -DSTRATA_Q6K_EXPERTS=ON` | no prebuilt engine for v0.1.45 (HTTP 404), and this GPU is not in any of them | engine rev `b95137167bd9b751` runs on this card |
+| 1 | build | prebuilt binaries | compile from source, `sm_89`, CUDA 12.8, `-DSTRATA_MMQ_KQUANTS=ON -DSTRATA_Q6K_EXPERTS=ON` | no prebuilt engine for v0.1.45 (HTTP 404), and this GPU is not in any of them | engine commit `477ac13c` runs on this card |
 | 2 | expert tier | resident expert arena | `--mmap-experts` (opt *out*) | 32 GB of experts cannot be pinned in 15 GB; the RAM tier holds nothing (`RAM 0 blobs`) | the documented A/B arm: 71.97 ms/token cold vs 34.78 warm |
 | 3 | context | 32,768 from setup | `--max-context 131072 --kv int8 --kv-resident 20480` | 32k died on the first request (`verify: instantiate: out of memory`); 16k worked; streaming KV puts the extra context in **pinned host RAM, not VRAM** | 16k → 131k, i.e. 8× the context, for −24% decode |
 | 4 | draft head | `--mtp` (839 MiB) | dropped, `--spec 4 --spec-min-p 0.5` | the MTP layer starved the native head upload (`out of memory`); IQ packs still require `--spec >= 2`, so suffix drafting survives | same as the Reddit poster's "sacrifice MTP" |
@@ -223,6 +224,13 @@ that justified it.
 | 7 | VRAM reclaimed | — | closed an unrelated app (`tern`, 892 MiB) | the cache is sized by what is actually free | expert cache 344 → **599 slots** |
 | 8 | download | unthrottled | `download-throttle.patch` → 3.5 MiB/s | keep a 66 GB pull inside the link's 4 MiB/s limit | 66 GB pulled without saturating the link |
 | 9 | port | 8080 | **8097** (`PORT` in `scripts/run.sh`) | SearXNG owns 8080 on this box, kubectl port-forwards own 8081–8082 | environment detail, not a tuning win |
+
+> **Pinning the engine.** The revision is the commit in `scripts/build.sh`
+> (`477ac13cbe8e582c20484871ce459d20d82df09d`, tag `v0.1.45`); the script fetches it if the
+> checkout is shallow and detaches, so a moving `main` cannot drift under a reproduction. Note
+> that `Strata/engine/BUILD.json`'s `"src"` field is **not** a revision — `setup.py`'s
+> `source_hash()` stores a 16-hex sha256 fingerprint of the engine sources, used to decide when a
+> `git pull` requires a rebuild (upstream issue #31).
 
 #### Delta 3 in detail: the context ladder nobody would have guessed
 
@@ -314,7 +322,7 @@ Null results are part of the methodology. These were tried on the same box, same
 
 | Tool | Measures | How |
 |---|---|---|
-| `tools/bench-strata.py` | prefill rate, decode rate | three `POST /v1/chat/completions` calls at `temperature 0`: long prompt + `max_tokens=1` (prefill), same prompt + generate (decode), short prompt + generate. Decode subtracts request 1's wall time so the prefill token is not counted twice — slightly conservative. Stdlib only; samples `/proc/meminfo` before and after |
+| `tools/bench-strata.py` | prefill rate, decode rate | three `POST /v1/chat/completions` calls at `temperature 0`: long prompt + `max_tokens=1` (prefill), same prompt + generate (decode), short prompt + generate. Rates are taken from the server's own `timings` block (`prompt_per_second`, `predicted_per_second`, which already exclude prefill from decode) and fall back to wall-clock tokens/second over the whole request; the source used is recorded per field in the output. Stdlib only; samples `/proc/meminfo` before and after |
 | `tools/reuse-test.py` | prefix reuse in the shape an agent sends | role-based multi-turn conversation, one request per turn; parses the engine's own `prompt N tokens = R reused + F read in T ms` line from the log |
 | `tools/stream-stat.sh` | SSD bytes/token, RSS, swap, page faults, VRAM | samples `/proc/<pid>/io read_bytes` (storage only, page-cache hits excluded), `/proc/<pid>/stat` majflt/minflt, and `nvidia-smi --query-compute-apps` |
 | `results.md` + workbench `short-python-v1` | end-to-end usefulness | 6 Python tasks, greedy (`temperature 0`, `reasoning_effort low`, `max_tokens 1024`, `seed 42`), code block extracted, executed, compared against expected output |
@@ -423,7 +431,8 @@ The methodology is portable; the numbers are not. What to change:
 
 - **Strata** (engine, architecture, all of the tiering/streaming/drafting design) —
   [github.com/Niko1221/Strata](https://github.com/Niko1221/Strata), MIT, Niko1221 and contributors.
-  This project builds it at rev `b95137167bd9b751` and applies one patch
+  This project builds it at commit `477ac13cbe8e582c20484871ce459d20d82df09d` (tag `v0.1.45`) and
+  applies one patch
   (`download-throttle.patch`). Model weights are ISTA-DASLab's GGUF quant under their own license.
 - **Everything else in this repo** (tooling, configs, measurements, write-up) — MIT, see
   [`LICENSE`](LICENSE). See [`CREDITS.md`](CREDITS.md) for the attribution breakdown.

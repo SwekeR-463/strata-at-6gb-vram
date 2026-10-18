@@ -41,5 +41,10 @@
   },
   "prefill_tok_s": 16.3,
   "decode_tok_s_after_long_prefill": 34000.0,
-  "decode_tok_s_short_prompt": 4.4
+  "decode_tok_s_short_prompt": 4.4,
+  "_corrections": {
+    "note": "Written 2026-10-17 by the pre-fix bench-strata.py. Values below are left exactly as emitted; this block annotates one of them rather than rewriting the record.",
+    "decode_tok_s_after_long_prefill": "INVALID (34000.0). The old code subtracted request 1's wall (18.014 s) from request 2's (4.494 s); request 2 had reused request 1's prefix, so it never paid that prefill. The difference went negative and max(0.001, ...) turned it into 34/0.001. Correct value from the same run: 7.79 tok/s end to end (requests[1].tok_s_end_to_end). Fixed in tools/bench-strata.py, which now reads the server's timings block and never clamps a negative denominator.",
+    "unaffected": "prefill_tok_s and decode_tok_s_short_prompt did not use the subtraction and stand as measured. The README's headline decode figures come from results/steady-1.json, steady-2.json and the short-python runs, not from this field."
+  }
 }

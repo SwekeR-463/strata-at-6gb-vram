@@ -25,8 +25,10 @@ SSD-streaming low-RAM mode.
   we changed, rejected levers, how each number was measured, limits), results
 - `LOG.md` - the running record: timeline, open items, fallbacks (same model only)
 - `results.md` - short-python-v1 per-task tables; `results/` - raw JSON/CSV of every run
-- `scripts/build.sh` / `scripts/run.sh` - reproduce the exact stack (engine rev `b95137167bd9b751`,
-  tuned flags from `config/strata-q2_0.json.template`)
+- `scripts/build.sh` / `scripts/run.sh` - reproduce the exact stack (engine commit
+  `477ac13cbe8e582c20484871ce459d20d82df09d`, tag `v0.1.45`, tuned flags from
+  `config/strata-q2_0.json.template`). Note: `Strata/engine/BUILD.json`'s `"src"` is a source
+  fingerprint, not a revision.
 - `data/MANIFEST.json` - the model files every measurement used (102 GB, not in the repo)
 - `logs/` - setup transcript and server console (evidence); `docs/strata-engine-help.txt` - engine flag reference
 - `Strata/` - the engine checkout (gitignored, upstream MIT); `Strata-data/` - shards, packs, MTP (gitignored)

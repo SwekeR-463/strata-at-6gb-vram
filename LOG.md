@@ -37,6 +37,26 @@ The running record of the experiment. For the design, the tuning and the measure
   (run 2: 7.40), all `finish_reason=stop`, 4,317 generated tokens. The +5.5% is the bigger cache (856
   slots, ~50% hit rate inside a request vs ~44% at 599 slots).
 
+- **2026-10-18 14:04** — **review repairs to the packaged repo** (nothing about the engine or the
+  tuning changed; the running server was stopped before these edits). Two defects found while
+  reviewing the refactor:
+  1. **The "engine revision" was never a revision.** `b95137167bd9b751` had been copied out of
+     `Strata/engine/BUILD.json`'s `"src"` field, which is a 16-hex sha256 fingerprint of the engine
+     sources (`setup.py:source_hash()`, the `git pull` staleness check for upstream issue #31), not
+     a commit. It resolved nowhere — not in the local checkout, and GitHub answered 422 "No commit
+     found". `scripts/build.sh` therefore could not check it out, breaking the documented reproduce
+     path. Replaced everywhere with the real commit `477ac13cbe8e582c20484871ce459d20d82df09d`
+     (tag `v0.1.45`), and `build.sh` now fetches a missing rev, detaches, and fails loudly instead
+     of dying on a bare pathspec error.
+  2. **`tools/bench-strata.py` could report a nonsense decode rate.** It subtracted request 1's
+     wall time from request 2 and clamped the denominator, so the shipped first run recorded
+     `34000.0 tok/s`. The two requests were not comparable (request 2 reuses request 1's prefix and
+     pays no prefill). Rates now come from the server's own `timings` block, with a wall-clock
+     fallback that counts all completion tokens and never clamps. The old value is annotated
+     in place in `results/bench-20261017-firstrun.json`; no headline number changes.
+  3. Units disclaimers, a stale tool default and the `results/` provenance fields are **still
+     open** — see Open items.
+
 ## Open items
 
 - **Run 1 vs run 2 is not a clean A/B.** ~80 min and a long session apart; a back-to-back 16k/131k
@@ -47,6 +67,16 @@ The running record of the experiment. For the design, the tuning and the measure
   next to the llama.cpp CPU-MoE numbers (Gemopus-4-26B 5/6, KAT-Coder V2.5 4/6) on the same box.
 - **PLE table** — the output-side n-gram lookup is read unbuffered (`--ple-io direct`) and is drawn
   in the data path but never profiled separately. Worth a `stream-stat.sh` run isolated to it.
+- **Units are undeclared in the write-up.** The README mixes GB and GiB ("~63 GB model" vs the
+  "66.4 GB download", "63 GB of GGUFs + 33 GB pack" vs `MANIFEST.total_disk_footprint_gb: 96` for
+  what is 101.9 GB decimal / 94.9 GiB on disk). Each figure is roughly right; a reader cannot tell
+  which unit is meant. Pick one (GiB) and label the table.
+- **`tools/bench-strata.py` still defaults to `--base-url …:8080`** while `run.sh` and
+  `reuse-test.py` default to 8097 — a bare invocation on this box reaches SearXNG. The README
+  example passes the flag, so it is a paper cut, not a wrong number.
+- **`results/` does not carry the engine commit**, which `AGENTS.md` asks for: the summary JSON says
+  only `"Strata (Niko1221/Strata @ main)"`. `results/bench-20261017-firstrun.json` was written
+  before the tool recorded any provenance at all.
 
 ## Fallbacks (same model only)
 

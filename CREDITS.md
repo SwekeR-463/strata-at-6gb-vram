@@ -5,8 +5,8 @@ This repo is a measurement record, not an engine. Split it cleanly:
 ## Upstream — everything that makes the model run at all
 
 **Strata**, [github.com/Niko1221/Strata](https://github.com/Niko1221/Strata), MIT license,
-Copyright (c) 2026 Niko1221 and contributors. Built here at revision **`b95137167bd9b751`**
-(v0.1.45) for `sm_89` / CUDA 12.8.
+Copyright (c) 2026 Niko1221 and contributors. Built here at commit
+**`477ac13cbe8e582c20484871ce459d20d82df09d`** (tag `v0.1.45`) for `sm_89` / CUDA 12.8.
 
 The design decisions that make a 177B MoE fit in 6 GB of VRAM belong to Strata, not to this
 project: the tiered adaptive expert cache, mmap expert streaming, the CPU pool that computes

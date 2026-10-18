@@ -39,7 +39,9 @@
   "engine": {
     "name": "Strata (Niko1221/Strata)",
     "version": "0.1.45",
-    "revision": "b95137167bd9b751",
+    "revision": "477ac13cbe8e582c20484871ce459d20d82df09d",
+    "tag": "v0.1.45",
+    "revision_note": "Strata/engine/BUILD.json's \"src\" field is NOT a revision: Strata's setup.py source_hash() stores a 16-hex sha256 fingerprint of the engine sources, used to decide when a git pull needs a rebuild (upstream issue #31). The commit above is the checkout this build came from.",
     "built": "from source, CUDA 12.8, CMAKE_CUDA_ARCHITECTURES=89, -DSTRATA_MMQ_KQUANTS=ON -DSTRATA_Q6K_EXPERTS=ON",
     "license": "MIT (upstream)"
   }

@@ -9,9 +9,16 @@ Three requests against /v1/chat/completions, temperature 0:
   2. same long prompt, max_tokens=N              -> decode rate after a long prefill
   3. short prompt, max_tokens=N                  -> decode rate from a warm short prompt
 
-Decode rate for (2) subtracts request (1)'s wall time, so the one token that
-belongs to the prefill is not counted twice; that makes it slightly
-conservative. Samples MemAvailable/swap around the run. Everything is stdlib.
+Rates come from the server's own `timings` block when present (Strata returns
+predicted_per_second / prompt_per_second, which exclude prefill from decode);
+otherwise they fall back to wall-clock tokens/second over the whole request.
+
+Request 2 deliberately does NOT subtract request 1's wall time. At these settings
+request 2 reuses request 1's prefix, so it does not pay that prefill at all, and the
+subtraction therefore compared unrelated numbers: it went negative and the clamp
+turned it into a nonsense "34000 tok/s" in results/bench-20261017-firstrun.json.
+
+Samples MemAvailable/swap around the run. Everything is stdlib.
 
 Machine-readable output includes the model ID, per the workbench convention.
 """
@@ -94,6 +101,7 @@ def main():
         "requests": [],
         "memory": {"before": sample_mem()},
     }
+    raw_wall = {}   # name -> unrounded wall seconds
 
     def run(name, prompt, max_tokens, note):
         body, dt = post(
@@ -108,7 +116,9 @@ def main():
             a.timeout,
         )
         usage = body.get("usage") or {}
+        timings = body.get("timings") or {}
         pt, ct = usage.get("prompt_tokens"), usage.get("completion_tokens")
+        raw_wall[name] = dt          # unrounded, for every derived rate below
         rec = {
             "name": name,
             "wall_s": round(dt, 3),
@@ -118,6 +128,12 @@ def main():
         }
         if ct:
             rec["tok_s_end_to_end"] = round(ct / dt, 2)
+        if timings:
+            rec["timings"] = timings
+            if timings.get("predicted_per_second"):
+                rec["decode_tok_s_server"] = timings["predicted_per_second"]
+            if timings.get("prompt_per_second"):
+                rec["prefill_tok_s_server"] = timings["prompt_per_second"]
         results["requests"].append(rec)
         print("%-12s %8.2fs  prompt=%-6s completion=%-5s (%s)" % (name, dt, pt, ct, note))
         return rec
@@ -126,13 +142,24 @@ def main():
     dec_long = run("decode_long", long_prompt, a.max_tokens, "same prompt, generate")
     dec_short = run("decode_short", "Write one sentence about the sea.", a.max_tokens, "short prompt")
 
-    if pre["prompt_tokens"] and pre["wall_s"]:
-        results["prefill_tok_s"] = round(pre["prompt_tokens"] / pre["wall_s"], 1)
-    if dec_long["completion_tokens"]:
-        denom = max(0.001, dec_long["wall_s"] - pre["wall_s"])
-        results["decode_tok_s_after_long_prefill"] = round((dec_long["completion_tokens"] - 1) / denom, 2)
-    if dec_short["completion_tokens"]:
-        results["decode_tok_s_short_prompt"] = round(dec_short["completion_tokens"] / dec_short["wall_s"], 2)
+    if pre.get("prefill_tok_s_server"):
+        results["prefill_tok_s"] = pre["prefill_tok_s_server"]
+        results["prefill_source"] = "server timings (prompt_per_second)"
+    elif pre["prompt_tokens"]:
+        results["prefill_tok_s"] = round(pre["prompt_tokens"] / raw_wall["prefill_long"], 1)
+        results["prefill_source"] = "wall clock"
+
+    results["decode_source"] = {}
+    for key, rec in (("decode_tok_s_after_long_prefill", dec_long),
+                     ("decode_tok_s_short_prompt", dec_short)):
+        if not rec["completion_tokens"]:
+            continue
+        if rec.get("decode_tok_s_server"):
+            results[key] = rec["decode_tok_s_server"]
+            results["decode_source"][key] = "server timings (predicted_per_second)"
+        else:
+            results[key] = round(rec["completion_tokens"] / raw_wall[rec["name"]], 2)
+            results["decode_source"][key] = "wall clock (whole request, all completion tokens)"
 
     results["memory"]["after"] = sample_mem()
     if a.out:
