@@ -98,7 +98,6 @@
     "max_context": 16384,
     "kv_resident": null,
     "note": "no --kv-resident at 16k: the whole KV fits in VRAM",
-    "source": "results/summary-20261017-firstrun.json -> engine.config_args",
-    "server_model_redaction": "the recorded absolute path was rewritten to repo-relative on 2026-10-18 (the local home-directory prefix removed); the file is data/MANIFEST.json -> files.shard1"
+    "source": "results/summary-20261017-firstrun.json -> engine.config_args"
   }
 }

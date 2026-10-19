@@ -9,7 +9,7 @@ Reference point: [Reddit: *QFN Q_2 strata configs for 8gb vram and 32gb ram*](ht
 `--expert-cache 2000 --resident-experts --kv q4_0 --kv-resident 20480 --adapt-* ...`.
 This project measures what the SSD-streaming fallback actually does on roughly half of that box.
 
-**TL;DR.** It runs: 6/6 on the short-python-v1 suite, **7.8 tok/s** decode, **51–54 tok/s** cold
+**TL;DR.** It runs: 6/6 on the short-python-v1 suite, **7.8 tok/s** decode, **48–54 tok/s** cold
 prefill, 131k context, **~85 MB of SSD reads per generated token**, 856 of 24,576 experts resident.
 Two changes made it viable on a card this small: **KV streaming** (`--kv int8 --kv-resident`) buys
 context with pinned host RAM instead of VRAM, and **conversation parking**
@@ -38,11 +38,7 @@ Strata doing what Strata does.
 ## Quick start
 
 ```bash
-git clone https://github.com/Niko1221/Strata Strata
-cd Strata && git checkout 477ac13cbe8e582c20484871ce459d20d82df09d   # v0.1.45
-cd ..
-
-./scripts/build.sh    # pin the engine, then download + prepare the weights (101.9 GB / 94.9 GiB)
+./scripts/build.sh    # clone + pin the engine (v0.1.45), then download + prepare the weights (101.9 GB / 94.9 GiB)
 ./scripts/run.sh      # start the server on :8097 (foreground; Ctrl-C stops it)
 ./tools/bench-strata.py --wait 600             # :8097 by default
 ./scripts/stop.sh     # or stop it from another shell — the engine goes with the server
@@ -54,7 +50,7 @@ cd ..
 | Env var | Default | What it is |
 |---|---|---|
 | `ROOT` | repo directory | where `Strata/` and `Strata-data/` live |
-| `DATA_DIR` | `$ROOT/Strata-data` | shards, packs, MTP draft |
+| `DATA_DIR` | `$ROOT/Strata-data` | shards and prepared packs (the MTP draft is downloaded here but not used) |
 | `PORT` | `8097` | this box uses 8097 because SearXNG owns 8080 and kubectl port-forwards own 8081–8082; pick any free port on yours |
 | `CONTEXT` | `131072` | `--max-context` |
 | `VRAM_RESERVE_MIB` | `512` | `--vram-reserve-mib` — the risky one; free VRAM is what becomes cache slots and chunk buffers |
@@ -85,7 +81,8 @@ cd Strata
 
 - No ready-made engine for v0.1.45 (HTTP 404) → compiled from source for `sm_89`
   (CUDA 12.8, `-DSTRATA_MMQ_KQUANTS=ON -DSTRATA_Q6K_EXPERTS=ON`).
-- Download: 2 shards, 66.4 GB total; pack `experts.bin` (+34 GB); MTP draft (~5 GB).
+- Download: 2 shards, 66.4 GB total; pack `experts.bin` (+34 GB); MTP draft (~6.9 GB, downloaded
+  by setup but not used — see `data/MANIFEST.json`).
 - Full setup transcript: `logs/setup-q2_0-20261017.log`.
 
 ### Local modifications (this project only)
@@ -118,7 +115,7 @@ AGENTS.md                      notes for the agent driving this box
 
 ## Methodology
 
-A ~63 GB model, 6 GB of VRAM, 15 GB of RAM. Everything here is an answer to two questions:
+A ~62 GiB (66 GB) model, 6 GB of VRAM, 15 GB of RAM. Everything here is an answer to two questions:
 **which** 6 GB, and what never gets read at all. To claim anything about the numbers, the two
 contributors have to be separated: **what Strata's engine does by design**, and **what this project
 changed to make it fit a box the engine refuses**. Both are below, with the evidence for each.
@@ -135,8 +132,8 @@ memory:
 | PLE n-gram table — the output-side lookup | **27 GB** GGUF | **NVMe**, read *unbuffered* past the OS cache, a few rows per token |
 | KV cache, `int8` | — | 20,480 of 131,072 cells/layer in **VRAM** (the flag's minimum), the rest in **1.55 GiB pinned RAM** |
 
-Total SSD footprint is ~96 GB (63 GB of GGUFs + a 33 GB prepared pack) to run a model that needs
-63 GB of weights in a 6 GB card.
+Total SSD footprint is **101.9 GB (94.9 GiB)**: 66.4 GB of GGUFs plus a 35.5 GB prepared pack, to
+run a model that needs 66.4 GB of weights in a 6 GB card.
 
 #### One generated token
 
@@ -228,7 +225,7 @@ that justified it.
 | 2 | expert tier | resident expert arena | `--mmap-experts` (opt *out*) | 32 GB of experts cannot be pinned in 15 GB; the RAM tier holds nothing (`RAM 0 blobs`) | the documented A/B arm: 71.97 ms/token cold vs 34.78 warm |
 | 3 | context | 32,768 from setup | `--max-context 131072 --kv int8 --kv-resident 20480` | 32k died on the first request (`verify: instantiate: out of memory`); 16k worked; streaming KV puts the extra context in **pinned host RAM, not VRAM** | 16k → 131k, i.e. 8× the context, for −24% decode |
 | 4 | draft head | `--mtp` (839 MiB) | dropped, `--spec 4 --spec-min-p 0.5` | the MTP layer starved the native head upload (`out of memory`); IQ packs still require `--spec >= 2`, so suffix drafting survives | same as the Reddit poster's "sacrifice MTP" |
-| 5 | VRAM reserve | `--vram-reserve-mib 700` | `512` (with `--kv-resident` at its 20,480 minimum) | free VRAM is what `--prefill auto` converts into cache slots and chunk buffers | expert cache **599 → 856 slots**, prompt chunk **512 → 1280**, cold prefill **41.6 → 51–54 tok/s** (+23–30%) |
+| 5 | VRAM reserve | `--vram-reserve-mib 700` | `512` (with `--kv-resident` at its 20,480 minimum) | free VRAM is what `--prefill auto` converts into cache slots and chunk buffers | expert cache **599 → 856 slots**, prompt chunk **512 → 1280**, cold prefill **41.7 → 48.5–53.9 tok/s** (+16–29%) |
 | 6 | conversation parking | off (`--conversation-cache-mib 0`) | `1024 MiB`, 4 slots, `min-tokens 128`, `park-gain 512` | without it every agent turn re-reads the whole conversation from SSD | a 5.2k-token turn: **107 s → 1–2 s** (5,208 of 5,229 tokens reused) |
 | 7 | VRAM reclaimed | — | closed an unrelated app (`tern`, 892 MiB) | the cache is sized by what is actually free | expert cache 344 → **599 slots** |
 | 8 | download | unthrottled | `download-throttle.patch` → 3.5 MiB/s | keep a 66 GB pull inside the link's 4 MiB/s limit | 66 GB pulled without saturating the link |
@@ -251,7 +248,7 @@ that justified it.
 | 16384 | int8, fully resident | 344 | 9.0–9.9 tok/s | 16.4 tok/s |
 | 65536 | int8, resident | 387 | 9.9–12.0 tok/s | 15.8 tok/s |
 | 65536 | int8 + `--kv-resident 32768` | 686 | ~9.9 tok/s | 19.7 tok/s |
-| **131072** | **int8 + `--kv-resident 20480`** | **856** | **7.4–7.8 tok/s (suite)** | **51–54 tok/s (retuned)** |
+| **131072** | **int8 + `--kv-resident 20480`** | **856** | **7.4–7.8 tok/s (suite)** | **48–54 tok/s (retuned)** |
 
 Only change between rows 1–3 was closing `tern`, freeing 892 MiB. KV streaming keeps 20,480 of
 131,072 cells per QSA layer in VRAM and the tail in **1.55 GiB of pinned RAM**; 99.2–99.6% of KV
@@ -337,6 +334,11 @@ Null results are part of the methodology. These were tried on the same box, same
 | `results.md` + workbench `short-python-v1` | end-to-end usefulness | 6 Python tasks, greedy (`temperature 0`, `reasoning_effort low`, `max_tokens 1024`, `seed 42`), code block extracted, executed, compared against expected output |
 | engine's own accounting | cache hit rate, chunk size, PCIe share, tail skip | read from the server log emitted per request |
 
+The engine's per-request lines (`prompt N tokens = R reused + F read in T ms …`) are the raw
+source for every prefill and reuse figure; `scripts/run.sh` writes them to `logs/strata-q2_0.log`
+(not shipped — it is runtime output and changes with every run). Sample the shipped transcripts for
+the build/setup path and `results/*.json` for everything the tools recorded.
+
 **Attribution.** Every number characterises the **whole stack**: Strata's engine design (tiered
 expert cache, SSD streaming, CPU pool, KV streaming) as configured for a 6 GB card. Running a 177B
 MoE on 6 GB is only possible because of that design — the architecture is Strata's. The tuning
@@ -371,7 +373,7 @@ Full per-task tables and raw run paths are in [`results.md`](results.md). Headli
 |---|---:|
 | Decode, steady 48–64 token generations | **9.0–9.9 tok/s** (16k context), **7.4–7.8 tok/s** (131k) |
 | Prefill, cold 293-token prompt | 16.4 tok/s (18.0 s) |
-| Prefill, retuned (chunk 1280) | 51–54 tok/s on 1,843- and 6,422-token prompts |
+| Prefill, retuned (chunk 1280) | 48–54 tok/s, five runs on 1,843- and 6,422-token prompts |
 | Prefill, warm (288/293 tokens reused) | 53.6 tok/s |
 | Expert cache hit rate | 24.7–51.6% (344–856 slots of 24,576) |
 | SSD reads, steady decode | **~83–89 MB per generated token** (~1.5 GB/s sustained) |

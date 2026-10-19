@@ -4,11 +4,12 @@ Strata/
 # Model data: 102 GB of shards, packs and MTP draft. See data/MANIFEST.json.
 Strata-data/
 
-# Runtime logs; the setup transcript is kept as evidence
+# Runtime logs; the setup transcript and the suite console are kept as evidence
 logs/server-console.log
 logs/strata-q2_0.log
 *.log
 !logs/setup-q2_0-20261017.log
+!results/short-python-console-20261017.log
 
 # Local, machine-specific state
 .port

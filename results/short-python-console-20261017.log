@@ -1,0 +1,12 @@
+[2026-10-17 21:31:32] merge-intervals: true
+[2026-10-17 21:33:09] binary-metrics: true
+[2026-10-17 21:34:27] flatten-dict: true
+[2026-10-17 21:35:54] dependency-order: true
+[2026-10-17 21:37:13] parse-env: true
+[2026-10-17 21:38:31] batch-iterable: true
+[2026-10-17 21:38:31] Short Python benchmark saved: /home/sweker/work/local=lm/results/short-python-qwen38-flash-next-q2_0-20261017-213012/summary.json
+{
+  "model_id": "qwen38-flash-next-q2_0",
+  "passed": 6,
+  "total": 6
+}

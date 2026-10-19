@@ -7,7 +7,7 @@ All numbers below were measured on **this** stack, end to end:
 | Model | **Qwen3.8 Flash Next Q2_0** (ISTA GSQ-RCO GGUF, 2-bit experts), 2 shards, 66.4 GB — the only model used in this project |
 | Engine | **[Strata](https://github.com/Niko1221/Strata) 0.1.45** — built from source for `sm_89` / CUDA 12.8 (no prebuilt binary for v0.1.45), expert profile + adaptive expert cache |
 | Serving | Strata's OpenAI-compatible server, `127.0.0.1:8097/v1` — `--mmap-experts` (experts read from the file tier), `--kv int8`, KV streamed via `--kv-resident`, `--prefill auto`, `--spec 4` |
-| Hardware | 6 GB VRAM NVIDIA laptop GPU, 15.6 GB RAM, NVMe measured at ~1.9 GB/s |
+| Hardware | 6 GB VRAM NVIDIA laptop GPU, 15.3 GiB RAM (16 GB installed), NVMe measured at ~1.9 GB/s |
 | Harness | `local=lm` → `scripts/benchmark-code.sh`, suite **short-python-v1** |
 | Protocol | greedy — `temperature 0`, `reasoning_effort low`, `max_tokens 1024`, `seed 42` |
 | Grading | 6 Python tasks; the code block is extracted from the reply, executed, and its output compared against the expected result |
@@ -96,7 +96,10 @@ No truncations in any run: every task finished with `finish_reason=stop`, all we
 | 3 (131k retuned) | `local=lm/results/short-python-qwen38-flash-next-q2_0-20261017-235955/` | `results/short-python-qwen38-flash-next-q2_0-131k-retuned-20261018.json` |
 
 Each raw directory holds the per-task request JSON, response, extracted candidate, evaluation
-output and a `summary.json`.
+output and a `summary.json`. The `response` / `candidate` / `evaluation` names recorded inside the
+summary copies point at files in those workbench directories, which are not shipped here; the
+summary copy above is the recording, and `results/short-python-console-20261017.log` is the run's
+console trace (6/6 with timestamps).
 
 ## Reproduce
 

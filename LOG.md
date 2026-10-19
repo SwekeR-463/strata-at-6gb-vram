@@ -77,6 +77,32 @@ The running record of the experiment. For the design, the tuning and the measure
      listener that is not Strata (so `PORT=8080`, which is SearXNG here, is a no-op), and reports
      the GPU/RAM it handed back. `LOG.md`'s `00:10` entry was also filed after `00:20`; fixed.
 
+- **2026-10-19 15:45** — **full-repo review; six corrections, no measurement changed.** Audited
+  every tracked file against the raw results and fixed what did not reconcile:
+  1. **Footprint arithmetic.** README §1 said "~96 GB (63 GB of GGUFs + a 33 GB prepared pack)" and
+     "a ~63 GB model"; the files are 66.4 GB of GGUFs + 35.5 GB of packs = **101.9 GB (94.9 GiB)**.
+     Corrected to agree with `data/MANIFEST.json` and the quick start.
+  2. **Prefill claim narrowed.** "51–54 tok/s" was the best two of five cold runs. The five are
+     **41.7 / 48.5 / 50.2 / 50.9 / 51.7 tok/s** at 1,843 tokens plus **53.9** at 6,422. Now stated as
+     **48–54 tok/s, five runs**. Delta 5's "+23–30%" becomes "+16–29%" (41.7 → 48.5–53.9).
+  3. **`summary-20261017-firstrun.json` had no `_provenance`** — the only `results/` file that broke
+     AGENTS.md's rule. Added (`model_id`, engine revision/tag, setup transcript, config pointer).
+  4. **`server_model_redaction` notes removed** from the three suite JSONs: they described a
+     home-prefix scrub that the shipped transcript (255 × `/home/sweker`) contradicts. `server_model`
+     stays repo-relative.
+  5. **MTP draft corrected.** It was downloaded to `Strata-data/mtp` (6.93 GB), never used, and has
+     since been deleted; README said "~5 GB" and `MANIFEST` described it as present. Both now say
+     downloaded / unused / deleted. `expert_profile.bytes` filled (196,632) and a `sum_scope` note
+     makes the total's scope explicit.
+  6. **Small alignments.** `results.md` RAM figure 15.6 GB → 15.3 GiB (16 GB installed); the suite
+     console trace `results/short-python-console-20261017.log` is now tracked as evidence; the
+     redundant manual `git clone` block in the quick start is gone (`build.sh` already clones/pins);
+     the per-task file names in the suite JSONs are explained as living in the workbench, not here.
+
+  Verified after the edits: all 9 JSONs parse, all scripts pass `bash -n` / `py_compile`, 0 broken
+  internal links, no secrets in tracked text, transcript still byte-identical (blob `a36d8bb`, md5
+  `368d8552…`). No measured value changed.
+
 ## Open items
 
 - **Run 1 vs run 2 is not a clean A/B.** ~80 min and a long session apart; a back-to-back 16k/131k

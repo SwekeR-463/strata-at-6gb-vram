@@ -99,7 +99,6 @@
     "kv_resident": 20480,
     "vram_reserve_mib": 512,
     "expert_cache_slots": 856,
-    "source": "LOG.md -> the 2026-10-18 00:02 timeline entry (the VRAM retune)",
-    "server_model_redaction": "the recorded absolute path was rewritten to repo-relative on 2026-10-18 (the local home-directory prefix removed); the file is data/MANIFEST.json -> files.shard1"
+    "source": "LOG.md -> the 2026-10-18 00:02 timeline entry (the VRAM retune)"
   }
 }

@@ -26,13 +26,13 @@
     },
     "expert_profile": {
       "path": "Strata/data/expert-profile.bin",
-      "bytes": null,
+      "bytes": 196632,
       "role": "routing-frequency profile that seeds the adaptive expert cache (shipped with the engine)"
     },
     "mtp_draft": {
       "path": "Strata-data/mtp",
-      "bytes": null,
-      "role": "draft layer (~5 GB) downloaded by setup.sh but NOT used: --mtp is dropped on this box"
+      "bytes": 6927659014,
+      "role": "draft layer downloaded by setup.sh during the measured run, NOT used (--mtp is dropped on this box) and deleted afterwards; listed so a reproduction knows it will be fetched and can be removed"
     }
   },
   "total_disk_footprint": {
@@ -40,8 +40,9 @@
     "gb_decimal": 101.88,
     "gib": 94.89,
     "unit_note": "gb_decimal = 1e9 bytes, gib = 2^30 bytes; both are given because the write-up used to mix them.",
+    "sum_scope": "sum of shard1 + shard2 + pack_experts + pack_dense (the model data a run needs). expert_profile ships with the engine and the MTP draft was downloaded but never used, so neither is counted.",
     "measured_on_disk_20261018": "101,893,290,735 bytes = 101.89 GB = 94.90 GiB (the ~9.9 MB difference from 'bytes' above is pack-directory metadata)",
-    "excludes": "the MTP draft, 6,927,659,014 bytes = 6.93 GB (6.45 GiB), in Strata-data/mtp: setup.sh downloads it, this project does not use it (--mtp is dropped on this box)"
+    "excludes": "the MTP draft, 6,927,659,014 bytes = 6.93 GB (6.45 GiB): setup.sh downloaded it to Strata-data/mtp, this project never used it (--mtp is dropped on this box), and it was deleted after the measured runs"
   },
   "engine": {
     "name": "Strata (Niko1221/Strata)",

@@ -98,7 +98,6 @@
     "max_context": 131072,
     "kv_resident": 32768,
     "expert_cache_slots": 599,
-    "source": "LOG.md -> the 2026-10-17 22:45 timeline entry",
-    "server_model_redaction": "the recorded absolute path was rewritten to repo-relative on 2026-10-18 (the local home-directory prefix removed); the file is data/MANIFEST.json -> files.shard1"
+    "source": "LOG.md -> the 2026-10-17 22:45 timeline entry"
   }
 }

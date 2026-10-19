@@ -48,6 +48,16 @@
     "prefill_cpu_share": "off (31.2 GiB of file pages vs 7.6 GiB free RAM)",
     "vram_warning": "146-284 MiB free; engine suggests --vram-reserve-mib 896 or smaller context (#2065)"
   },
+  "_provenance": {
+    "model_id": "qwen3.8-flash-next-q2_0",
+    "engine": "Strata",
+    "engine_version": "0.1.45",
+    "engine_revision": "477ac13cbe8e582c20484871ce459d20d82df09d",
+    "engine_tag": "v0.1.45",
+    "setup_transcript": "logs/setup-q2_0-20261017.log",
+    "config_recorded_in": "this file -> engine.config_args (the exact serve flags of the first-run stack); the retuned stack is config/strata-q2_0.json.template rendered by scripts/run.sh",
+    "annotated": "2026-10-19: added by the review that checked provenance coverage against AGENTS.md. The measurement itself is unchanged."
+  },
   "reference_reddit_box": {
     "gpu": "RTX 3070 8 GB, 32 GB DDR4",
     "decode_tok_s": 36,
