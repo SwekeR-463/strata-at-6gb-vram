@@ -1,6 +1,5 @@
 # Engine checkout and build artifacts — upstream code, obtained by scripts/build.sh
 Strata/
-!Strata/.gitignore
 
 # Model data: 102 GB of shards, packs and MTP draft. See data/MANIFEST.json.
 Strata-data/

@@ -86,7 +86,7 @@ cd Strata
 - No ready-made engine for v0.1.45 (HTTP 404) → compiled from source for `sm_89`
   (CUDA 12.8, `-DSTRATA_MMQ_KQUANTS=ON -DSTRATA_Q6K_EXPERTS=ON`).
 - Download: 2 shards, 66.4 GB total; pack `experts.bin` (+34 GB); MTP draft (~5 GB).
-- Full transcript: `logs/setup-q2_0-20261017.log`.
+- Full setup transcript: `logs/setup-q2_0-20261017.log`.
 
 ### Local modifications (this project only)
 
